@@ -9,7 +9,7 @@ import java.net.Socket;
 public class Server {
 
     public static void main(String[] args) throws InterruptedException {
-//  стартуем сервер на порту 3345
+//  стартуем сервер на порту 3345  //им
 
         try (ServerSocket server= new ServerSocket(3345)){
 // становимся в ожидание подключения к сокету под именем - "client" на серверной стороне
