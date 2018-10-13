@@ -1,8 +1,8 @@
 package pw.dimax.server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import pw.dimax.util.Log;
+
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -18,15 +18,18 @@ public class Server {
             DataOutputStream out = new DataOutputStream(client.getOutputStream());
             DataInputStream in = new DataInputStream(client.getInputStream());
 
-            System.out.println(client.isClosed());
+            out.writeUTF("rr");
+            out.flush();
+
+            //test callback
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
             while(!client.isClosed()){
 
                 System.out.println("Server reading from channel");
                 String entry = in.readUTF();
 
                 System.out.println("READ from client message - " + entry);
-
-                System.out.println("Server try writing to channel");
 
                 if(entry.equalsIgnoreCase("quit")){
                     System.out.println("Client initialize connections suicide ...");
@@ -36,11 +39,15 @@ public class Server {
                 }
 
 
-                out.writeUTF("Server reply - "+entry + " - OK");
-                System.out.println("Server Wrote message to client.\n" +
-                        "Server reply - "+entry + " - OK");
+                if(br.ready()){
+                    String s = br.readLine();
+                    out.writeUTF(s);
+                    Log.print(s);
+                   // out.flush();
+                }
 
-                out.flush();
+                out.writeUTF("555 OK");
+                //out.flush();
 
             }
 

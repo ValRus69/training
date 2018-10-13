@@ -9,68 +9,51 @@ public class Client {
 
     public static void main(String[] args) throws InterruptedException {
 
-// запускаем подключение сокета по известным координатам и нициализируем приём сообщений с консоли клиента
+
         try(Socket socket = new Socket("localhost", 3345);
-            BufferedReader br =new BufferedReader(new InputStreamReader(System.in));
-            DataOutputStream oos = new DataOutputStream(socket.getOutputStream());
-            DataInputStream ois = new DataInputStream(socket.getInputStream()); )
-        {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            DataInputStream in = new DataInputStream(socket.getInputStream()) ) {
 
+            Thread.sleep(2000);
+            String t = in.readUTF();
             System.out.println("Client connected to socket.");
-            System.out.println();
-            System.out.println("Client writing channel = oos & reading channel = ois initialized.");
 
-// проверяем живой ли канал и работаем если живой
             while(!socket.isOutputShutdown()){
 
-// ждём консоли клиента на предмет появления в ней данных
                 if(br.ready()){
 
-// данные появились - работаем
-                    System.out.println("Client start writing in channel...");
-                    Thread.sleep(1000);
                     String clientCommand = br.readLine();
 
-// пишем данные с консоли в канал сокета для сервера
-                    oos.writeUTF(clientCommand);
-                    oos.flush();
-                    System.out.println("Clien sent message " + clientCommand + " to server.");
-                    Thread.sleep(4000);
-// ждём чтобы сервер успел прочесть сообщение из сокета и ответить
+                    out.writeUTF(clientCommand);
+                    out.flush();
 
-// проверяем условие выхода из соединения
+                    System.out.println("Clien sent message " + clientCommand + " to server.");
+
                     if(clientCommand.equalsIgnoreCase("quit")){
 
-// если условие выхода достигнуто разъединяемся
-                        System.out.println("Client kill connections");
-                        Thread.sleep(1000);
-
-// смотрим что нам ответил сервер на последок перед закрытием ресурсов
-                        if(ois.read() > -1)     {
+                        if(in.read() > -1)     {
                             System.out.println("reading...");
-                            String in = ois.readUTF();
-                            System.out.println(in);
+                            String input = in.readUTF();
+                            System.out.println(input);
                         }
 
-// после предварительных приготовлений выходим из цикла записи чтения
                         break;
                     }
 
-// если условие разъединения не достигнуто продолжаем работу
-                    System.out.println("Client sent message & start waiting for data from server...");
-                    Thread.sleep(4000);
+                    System.out.println(in.readUTF());
 
-// проверяем, что нам ответит сервер на сообщение(за предоставленное ему время в паузе он должен был успеть ответить)
-                    System.out.println("message " + ois.read());
-                    if(ois.read() > 1)     {
-                        System.out.println("reading...");
-                        String in = ois.readUTF();
-                        System.out.println(in);
+                    if(in.read() > 1)     {
+                        String input = in.readUTF();
+                        System.out.println(input);
                     }
+
                 }
             }
-// на выходе из цикла общения закрываем свои ресурсы
+
             System.out.println("Closing connections & channels on clentSide - DONE.");
+
+
 
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
