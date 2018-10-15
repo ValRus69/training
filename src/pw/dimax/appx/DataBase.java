@@ -1,5 +1,7 @@
 package pw.dimax.appx;
 
+import pw.dimax.util.Log;
+
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
@@ -15,7 +17,17 @@ public class DataBase {
 
 
 
-    public DataBase() {}
+    public DataBase() {
+        this.driver = "org.postgresql.Driver";
+        this.url = "jdbc:postgresql://localhost:5432/dmx";
+
+        this.properties = new Properties();
+        this.properties.setProperty("password", "2737306");
+        this.properties.setProperty("user", "postgres");
+        this.properties.setProperty("lc_ctype", "UTF8");
+    }
+
+
 
     public DataBase(String driver, String url, String login, String password, String charset) {
         this.driver = driver;
@@ -33,7 +45,7 @@ public class DataBase {
         try {
             Class.forName( getDriver() );
         } catch (ClassNotFoundException e) {
-            Log.exception(e);;
+            Log.exception(e);
         }
 
         try {
@@ -57,66 +69,6 @@ public class DataBase {
         this.connection = null;
     }
 
-
-
-    public CachedRowSet executeQuery(String query) {
-        CachedRowSet crs = null;
-        try {
-            this.Connect();
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-
-            RowSetFactory factory = RowSetProvider.newFactory();
-            crs = factory.createCachedRowSet();
-
-            crs.populate(rs);
-
-            rs.close();
-            stmt.close();
-        } catch (SQLException e) {
-            Log.exception(e);
-        } finally {
-            this.Disconnect(connection);
-        }
-
-        return crs;
-    }
-
-
-
-    public int executeUpdate(String query) {
-        int numrows = 0;
-        try {
-            this.Connect();
-            Statement stmt = connection.createStatement();
-            numrows = stmt.executeUpdate(query);
-            stmt.close();
-        } catch (SQLException e) {
-            Log.exception(e);
-        } finally {
-            this.Disconnect(connection);
-        }
-
-        return numrows;
-    }
-
-
-
-    public boolean execute(String query) {
-        boolean res = false;
-        try {
-            this.Connect();
-            Statement stmt = connection.createStatement();
-            res = stmt.execute(query);
-            stmt.close();
-        } catch (SQLException e) {
-            Log.exception(e);
-        } finally {
-            this.Disconnect(connection);
-        }
-
-        return res;
-    }
 
 
 
