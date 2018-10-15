@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 
@@ -34,6 +35,7 @@ public class Server implements Runnable{
     public Server(InetAddress host, int port) throws IOException {
         this.host = host;
         this.port = port;
+        this.selector = this.initSelector();
     }
 
     private Selector initSelector() throws IOException {
@@ -48,10 +50,10 @@ public class Server implements Runnable{
         // Bind the server socket to the specified address and port
         socketChannel.socket().bind( new InetSocketAddress(this.host, this.port) );
 
+        // Register the server socket channel, indicating an interest in
+        // accepting new connections
+        socketChannel.register(socketSelector, SelectionKey.OP_ACCEPT);
 
-
-
-
-        return null;
+        return socketSelector;
     }
 }
