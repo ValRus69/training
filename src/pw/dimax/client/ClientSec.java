@@ -14,7 +14,7 @@ public class ClientSec {
 
         System.out.println("Connecting to localhost");
 
-        fromserver = new Socket("localhost",4444);
+        fromserver = new Socket(InetAddress.getLocalHost(),7272);
         BufferedReader in  = new
                 BufferedReader(new
                 InputStreamReader(fromserver.getInputStream()));
